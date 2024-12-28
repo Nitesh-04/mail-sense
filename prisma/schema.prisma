@@ -12,3 +12,47 @@ datasource db {
   provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id         String              @id @default(uuid())
+  clerkId    String              @unique
+  name       String
+  mailId     String              @unique
+  emails     Email[]
+  embeddings PineconeEmbedding[]
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+}
+
+model Email {
+  id                  String             @id @default(uuid())
+  clerkId             String
+  sender              String
+  subject             String
+  body                String?
+  summary             String
+  embedding           Float[]            // Embedding saved locally
+  receivedAt          DateTime
+  user                User               @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+  pineconeEmbeddingId String? 
+  pineconeEmbedding   PineconeEmbedding?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([clerkId])
+  @@index([receivedAt])
+}
+
+model PineconeEmbedding {                       // for faster pinecone fetch
+  id        String   @id @default(uuid())
+  clerkId   String
+  emailId   String   @unique
+  embedding Float[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+  email     Email    @relation(onDelete: Cascade, fields: [emailId], references: [id])
+
+  @@index([clerkId])
+  @@index([emailId])
+}
