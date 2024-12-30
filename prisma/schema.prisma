@@ -31,8 +31,8 @@ model Email {
   subject             String
   body                String?
   summary             String
-  embedding           Float[]            // Embedding saved locally
   receivedAt          DateTime
+  category            Category
   user                User               @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
   pineconeEmbeddingId String? 
   pineconeEmbedding   PineconeEmbedding?
@@ -43,7 +43,15 @@ model Email {
   @@index([receivedAt])
 }
 
-model PineconeEmbedding {                       // for faster pinecone fetch
+enum Category {
+  Academics
+  Cdc
+  Events
+  Hostel
+  Misc
+}
+
+model PineconeEmbedding {                      // local embedding save
   id        String   @id @default(uuid())
   clerkId   String
   emailId   String   @unique
