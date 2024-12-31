@@ -4,7 +4,7 @@ import prisma from "@/utils/db";
 
 export async function getAcademicMails(userId : String)
 {
-    return await prisma.mail.findMany({
+    return await prisma.email.findMany({
         where: {
             clerkId: userId,
             category: "Academics"
@@ -16,7 +16,7 @@ export async function getAcademicMails(userId : String)
 
 export async function getCdcMails(userId : String)
 {
-    return await prisma.mail.findMany({
+    return await prisma.email.findMany({
         where: {
             clerkId: userId,
             category: "Cdc"
@@ -28,7 +28,7 @@ export async function getCdcMails(userId : String)
 
 export async function getEventsMails(userId : String)
 {
-    return await prisma.mail.findMany({
+    return await prisma.email.findMany({
         where: {
             clerkId: userId,
             category: "Events"
@@ -40,7 +40,7 @@ export async function getEventsMails(userId : String)
 
 export async function getHostelMails(userId : String)
 {
-    return await prisma.mail.findMany({
+    return await prisma.email.findMany({
         where: {
             clerkId: userId,
             category: "Hostel"
@@ -52,7 +52,7 @@ export async function getHostelMails(userId : String)
 
 export async function getMiscMails(userId : String)
 {
-    return await prisma.mail.findMany({
+    return await prisma.email.findMany({
         where: {
             clerkId: userId,
             category: "Misc"

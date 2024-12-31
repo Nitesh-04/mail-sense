@@ -3,14 +3,14 @@
 import prisma from "@/utils/db";
 
 export async function checkUser(
-  clerkid: string,
+  clerkId: string,
   email: string,
   name: string,
 ) {
   try {
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [{ clerkid }, { email }],
+        OR: [{ clerkId }, { mailId: email }],
       },
     });
 
@@ -24,9 +24,9 @@ export async function checkUser(
 
     const newUser = await prisma.user.create({
       data: {
-        clerkid,
-        email,
+        clerkId,
         name,
+        mailId : email,
       },
     });
 
