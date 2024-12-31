@@ -14,14 +14,14 @@ datasource db {
 }
 
 model User {
-  id         String              @id @default(uuid())
-  clerkId    String              @unique
-  name       String
-  mailId     String              @unique
-  emails     Email[]
-  embeddings PineconeEmbedding[]
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
+  id           String              @id @default(uuid())
+  clerkId      String              @unique
+  name         String
+  mailId       String              @unique
+  emails       Email[]
+  embeddings   PineconeEmbedding[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
 }
 
 model Email {
