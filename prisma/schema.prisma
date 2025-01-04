@@ -18,6 +18,9 @@ model User {
   clerkId      String              @unique
   name         String
   mailId       String              @unique
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?
   emails       Email[]
   embeddings   PineconeEmbedding[]
   createdAt    DateTime            @default(now())
