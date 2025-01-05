@@ -19,7 +19,6 @@ export async function GET(req: Request) {
   }
 
   try {
-    console.log("Attempting to get tokens...");
     const tokens = await getTokens(code);
 
     if (!tokens || !tokens.access_token || !tokens.refresh_token) {
@@ -44,8 +43,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Failed to fetch email" });
     }
 
-    console.log(`Fetched user email: ${userinfo.data.email}`);
-
     
     await prisma.user.update({
       where: { clerkId: userId },
@@ -56,7 +53,6 @@ export async function GET(req: Request) {
       },
     });
 
-    console.log("User updated successfully. Redirecting to /mail...");
     return NextResponse.redirect(new URL("/mail", req.url));
   } catch (error) {
     console.error("OAuth Error:", error);

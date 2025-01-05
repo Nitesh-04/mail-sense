@@ -22,7 +22,6 @@ export async function getAuthUrl() {
     "https://www.googleapis.com/auth/userinfo.email",
   ];
 
-  console.log("Generating Google OAuth URL...");
 
   const url = oauth2Client.generateAuthUrl({
     access_type: "offline",
@@ -31,17 +30,13 @@ export async function getAuthUrl() {
     prompt: "consent",
   });
 
-  console.log("Generated URL:", url);
-
   return url;
 }
 
 export async function getTokens(code: string) {
-  console.log("Exchanging authorization code for tokens...");
   try {
     const { tokens, res } = await oauth2Client.getToken(code);
     const expiresIn = res?.data?.expires_in || 3600;
-    console.log("Tokens received:", tokens);
     return {
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,
@@ -55,7 +50,6 @@ export async function getTokens(code: string) {
 }
 
 export function setCredentials(accessToken: string, refreshToken: string) {
-  console.log("Setting OAuth credentials...");
   oauth2Client.setCredentials({
     access_token: accessToken,
     refresh_token: refreshToken,

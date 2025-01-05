@@ -19,7 +19,6 @@ async function fetchAndCreateEmails(
   });
 
   const messages = response.data.messages || [];
-  console.log(`Fetched ${messages.length} message IDs`);
 
   await Promise.all(
     messages.map(async (msg) => {
@@ -91,8 +90,7 @@ export async function GET() {
         { status: 401 }
       );
     }
-
-    console.log("Fetching and creating emails...");
+    
     await fetchAndCreateEmails(user.accessToken, userId);
 
     return NextResponse.json({
