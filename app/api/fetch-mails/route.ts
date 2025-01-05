@@ -3,11 +3,12 @@ import { oauth2Client } from "@/utils/gmailAuth";
 import prisma from "@/utils/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { categoriseMail } from "@/utils/categoriseMail";
 
 async function fetchAndCreateEmails(
   accessToken: string,
   userId: string,
-  maxResults: number = 20
+  maxResults: number = 10
 ) {
   oauth2Client.setCredentials({ access_token: accessToken });
   const gmail = google.gmail({ version: "v1", auth: oauth2Client });
@@ -46,6 +47,8 @@ async function fetchAndCreateEmails(
         msgDetails.data.internalDate || Date.now().toString();
       const receivedAt = new Date(parseInt(internalDate, 10));
 
+      const mailCategory = categoriseMail(from);
+
       await prisma.email.create({
         data: {
           clerkId: userId,
@@ -54,7 +57,7 @@ async function fetchAndCreateEmails(
           body,
           summary: body.slice(0, 200),
           receivedAt,
-          category: "Misc",
+          category: mailCategory,
         },
       });
     })

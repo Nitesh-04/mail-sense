@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { SignOutButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -24,6 +24,7 @@ export default function Page() {
       <h1>{user.id}</h1>
       <h1>{user.primaryEmailAddress?.emailAddress}</h1>
       <h1>{user.fullName}</h1>
+      <SignOutButton/>
     </div>
   );
 }

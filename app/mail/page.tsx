@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
-import { getMiscMails } from "./_actions/actions";
+import { getCdcMails, getMiscMails } from "./_actions/actions";
 
 type Email = {
   id: string;
@@ -31,7 +31,7 @@ export default function MailPage() {
           throw new Error("Failed to sync emails with Gmail");
         }
 
-        const fetchedEmails = await getMiscMails(user.id);
+        const fetchedEmails = await getCdcMails(user.id);
         setEmails(fetchedEmails);
       } catch (err) {
         setError(

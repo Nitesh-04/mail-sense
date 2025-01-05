@@ -4,11 +4,13 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { checkUser } from "./_actions/actions";
+import Link from "next/link";
 
 export default function AccessPage() {
   const { user } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const userId = user?.id;
 
   useEffect(() => {
     if (!user) {
@@ -54,6 +56,7 @@ export default function AccessPage() {
       </button>
       <br/>
       <span className="font-bold">KINDLY USE THE SAME EMAIL ID AS REGISTERED WITH MAILSENSE</span>
+      <p className="text-black font-bold text-lg mt-10 border-2 border-blue-600 rounded-md p-2"> <Link href={"/chat"}>Chat</Link> </p>
     </div>
   );
 }
