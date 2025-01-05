@@ -2,7 +2,6 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { checkUser } from "./_actions/actions";
 import { useEffect } from "react";
 
 export default function Page() {
@@ -12,12 +11,6 @@ export default function Page() {
   useEffect(() => {
     if (!user) {
       router.push("/sign-in");
-    } else {
-      checkUser(
-        user.id,
-        user.primaryEmailAddress?.emailAddress || '',
-        user.fullName || ''
-      );
     }
   }, [user, router]);
 

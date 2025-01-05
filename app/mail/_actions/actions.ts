@@ -57,7 +57,7 @@ export async function getMiscMails(userId : string)
             clerkId: userId,
             category: "Misc"
         },
-        orderBy : {updatedAt: 'desc'},
+        orderBy : {receivedAt: 'desc'},
         take: 5
     });
 }

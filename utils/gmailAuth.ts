@@ -1,4 +1,6 @@
 import { google } from "googleapis";
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 export const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -6,7 +8,15 @@ export const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_REDIRECT_URI
 );
 
-export function getAuthUrl() {
+export async function getAuthUrl() {
+
+    const user = await currentUser();
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const userMailId = user.primaryEmailAddress?.emailAddress;
+
   const scopes = [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/userinfo.email",
@@ -17,6 +27,7 @@ export function getAuthUrl() {
   const url = oauth2Client.generateAuthUrl({
     access_type: "offline",
     scope: scopes,
+    login_hint: userMailId,
     prompt: "consent",
   });
 

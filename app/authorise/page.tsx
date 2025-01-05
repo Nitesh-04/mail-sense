@@ -3,7 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { checkUser } from "../chat/_actions/actions";
+import { checkUser } from "./_actions/actions";
 
 export default function AccessPage() {
   const { user } = useUser();
@@ -52,6 +52,8 @@ export default function AccessPage() {
       >
         {loading ? "Authenticating..." : "Authenticate with Gmail"}
       </button>
+      <br/>
+      <span className="font-bold">KINDLY USE THE SAME EMAIL ID AS REGISTERED WITH MAILSENSE</span>
     </div>
   );
 }
