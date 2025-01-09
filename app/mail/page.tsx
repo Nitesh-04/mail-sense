@@ -2,7 +2,8 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
-import { getCdcMails, getMiscMails } from "./_actions/actions";
+import { getCdcMails, getMiscMails} from "./_actions/actions";
+import { redirect } from "next/navigation";
 
 type Email = {
   id: string;
@@ -21,32 +22,37 @@ export default function MailPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!user) return;
-
-    const syncAndFetchEmails = async () => {
-      setLoading(true);
-      try {
-        const syncResponse = await fetch("/api/fetch-mails");
-        if (!syncResponse.ok) {
-          throw new Error("Failed to sync emails with Gmail");
-        }
-
-        const fetchedEmails = await getCdcMails(user.id);
-        setEmails(fetchedEmails);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "An error occurred while processing emails."
-        );
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    syncAndFetchEmails();
+    if (!user) {
+      redirect("/sign-in");
+      return;
+    }
   }, [user]);
+
+
+  const syncAndFetchEmails = async () => {
+    setLoading(true);
+    try {
+      const syncResponse = await fetch("/api/fetch-mails");
+      if (!syncResponse.ok) {
+        throw new Error("Failed to sync emails with Gmail");
+      }
+      const userId = user?.id;
+      if (!userId) {
+        throw new Error("User ID is undefined");
+      }
+      const fetchedEmails = await getMiscMails(userId);
+      setEmails(fetchedEmails);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while processing emails."
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -106,6 +112,7 @@ export default function MailPage() {
             </div>
           ))}
         </div>
+        <button onClick={syncAndFetchEmails}>Fetch Mails</button>
       </div>
     </div>
   );

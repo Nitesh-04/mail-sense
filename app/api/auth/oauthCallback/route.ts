@@ -26,10 +26,8 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Failed to retrieve tokens" });
     }
 
-    const expiryDate = tokens.expiry_date
-      ? new Date(tokens.expiry_date)
-      : new Date(Date.now() + (tokens.expires_in || 3600) * 1000);
-
+    const expiryDate = new Date(Date.now() + (tokens.expires_in) * 1000);;
+    console.log("Expiry Date:", expiryDate);
     
     oauth2Client.setCredentials(tokens);
 
