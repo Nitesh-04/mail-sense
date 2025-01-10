@@ -24,8 +24,20 @@ export default function MailPage() {
   useEffect(() => {
     if (!user) {
       redirect("/sign-in");
-      return;
     }
+    async function fetchEmails() {
+
+    const userId = user?.id;
+
+      if (!userId) {
+        throw new Error("User ID is undefined");
+      }
+
+      const fetchedEmails = await getMiscMails(userId);
+      
+      setEmails(fetchedEmails);
+    }
+    fetchEmails();
   }, [user]);
 
 
@@ -33,15 +45,21 @@ export default function MailPage() {
     setLoading(true);
     try {
       const syncResponse = await fetch("/api/fetch-mails");
+
       if (!syncResponse.ok) {
         throw new Error("Failed to sync emails with Gmail");
       }
+
       const userId = user?.id;
+
       if (!userId) {
         throw new Error("User ID is undefined");
       }
+
       const fetchedEmails = await getMiscMails(userId);
+
       setEmails(fetchedEmails);
+
     } catch (err) {
       setError(
         err instanceof Error
@@ -68,6 +86,7 @@ export default function MailPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Your Emails</h1>
+        <button onClick={syncAndFetchEmails}>Fetch Mails</button>
 
         {loading && (
           <div className="flex justify-center items-center py-8">

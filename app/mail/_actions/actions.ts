@@ -58,6 +58,6 @@ export async function getMiscMails(userId : string)
             category: "Misc"
         },
         orderBy : {receivedAt: 'desc'},
-        take: 5
+        take: 10
     });
 }

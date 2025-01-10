@@ -8,17 +8,23 @@ import { categoriseMail } from "@/utils/categoriseMail";
 async function fetchAndCreateEmails(
   accessToken: string,
   userId: string,
-  maxResults: number = 10
+  lastEmailId: string | null = null,
+  maxResults: number
 ) {
   oauth2Client.setCredentials({ access_token: accessToken });
   const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
-  const response = await gmail.users.messages.list({
-    userId: "me",
-    maxResults,
-  });
+  const queryParams = {
+    userId: "me" as "me",
+    maxResults: maxResults,
+    ...(lastEmailId ? { q: `after:${lastEmailId}` } : {})
+  };
 
+  const response = await gmail.users.messages.list(queryParams);
   const messages = response.data.messages || [];
+
+  
+  const mostRecentEmailId = messages[0]?.id;
 
   await Promise.all(
     messages.map(async (msg) => {
@@ -61,6 +67,8 @@ async function fetchAndCreateEmails(
       });
     })
   );
+
+   return mostRecentEmailId;
 }
 
 export async function GET() {
@@ -90,13 +98,41 @@ export async function GET() {
         { status: 401 }
       );
     }
-    
-    await fetchAndCreateEmails(user.accessToken, userId);
 
-    return NextResponse.json({
-      success: true,
-      message: "Emails successfully synced to database",
-    });
+    if (!user.firstFetch) {
+      const mostRecentEmailId = await fetchAndCreateEmails(user.accessToken, userId, null, 200);
+      
+      await prisma.user.update({
+        where: { clerkId: userId },
+        data: { 
+          firstFetch: true,
+          lastEmailId: mostRecentEmailId  
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: "Emails successfully synced to database",
+      });
+    } else {
+      
+      const mostRecentEmailId = await fetchAndCreateEmails(user.accessToken, userId, user.lastEmailId, 50);
+      
+      if (mostRecentEmailId) {
+        await prisma.user.update({
+          where: { clerkId: userId },
+          data: { 
+            lastEmailId: mostRecentEmailId  
+          },
+        });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "New emails synced to database",
+      });
+    }
+
   } catch (error) {
     console.error("Failed to fetch/create emails:", error);
     return NextResponse.json(
