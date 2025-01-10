@@ -21,6 +21,8 @@ model User {
   accessToken  String?
   refreshToken String?
   tokenExpiry  DateTime?
+  lastEmailId  String?
+  firstFetch   Boolean             @default(false)
   emails       Email[]
   embeddings   PineconeEmbedding[]
   createdAt    DateTime            @default(now())
