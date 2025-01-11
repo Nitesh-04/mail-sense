@@ -8,7 +8,7 @@ import { categoriseMail } from "@/utils/categoriseMail";
 async function fetchAndCreateEmails(
   accessToken: string,
   userId: string,
-  lastEmailId: string | null = null,
+  lastEmailDate: Date | null = null,
   maxResults: number
 ) {
   oauth2Client.setCredentials({ access_token: accessToken });
@@ -17,14 +17,15 @@ async function fetchAndCreateEmails(
   const queryParams = {
     userId: "me" as "me",
     maxResults: maxResults,
-    ...(lastEmailId ? { q: `after:${lastEmailId}` } : {})
+    ...(lastEmailDate ? {
+      q: `after:${lastEmailDate.getFullYear()}/${(lastEmailDate.getMonth() + 1).toString().padStart(2, '0')}/${lastEmailDate.getDate().toString().padStart(2, '0')}`
+    } : {})
   };
 
   const response = await gmail.users.messages.list(queryParams);
   const messages = response.data.messages || [];
 
-  
-  const mostRecentEmailId = messages[0]?.id;
+  const mostRecentEmailDate = new Date(0); 
 
   await Promise.all(
     messages.map(async (msg) => {
@@ -51,6 +52,10 @@ async function fetchAndCreateEmails(
       const internalDate =
         msgDetails.data.internalDate || Date.now().toString();
       const receivedAt = new Date(parseInt(internalDate, 10));
+      
+      if (receivedAt > mostRecentEmailDate) {
+        mostRecentEmailDate.setTime(receivedAt.getTime());
+      }
 
       const mailCategory = categoriseMail(from);
 
@@ -68,7 +73,7 @@ async function fetchAndCreateEmails(
     })
   );
 
-   return mostRecentEmailId;
+   return mostRecentEmailDate;
 }
 
 export async function GET() {
@@ -100,13 +105,13 @@ export async function GET() {
     }
 
     if (!user.firstFetch) {
-      const mostRecentEmailId = await fetchAndCreateEmails(user.accessToken, userId, null, 200);
+      const mostRecentEmailDate = await fetchAndCreateEmails(user.accessToken, userId, null, 200);
       
       await prisma.user.update({
         where: { clerkId: userId },
         data: { 
           firstFetch: true,
-          lastEmailId: mostRecentEmailId  
+          lastEmailDate: mostRecentEmailDate
         },
       });
 
@@ -115,14 +120,18 @@ export async function GET() {
         message: "Emails successfully synced to database",
       });
     } else {
+      const mostRecentEmailDate = await fetchAndCreateEmails(
+        user.accessToken,
+        userId,
+        user.lastEmailDate || null,
+        50
+      );
       
-      const mostRecentEmailId = await fetchAndCreateEmails(user.accessToken, userId, user.lastEmailId, 50);
-      
-      if (mostRecentEmailId) {
+      if (mostRecentEmailDate) {
         await prisma.user.update({
           where: { clerkId: userId },
           data: { 
-            lastEmailId: mostRecentEmailId  
+            lastEmailDate: mostRecentEmailDate
           },
         });
       }
