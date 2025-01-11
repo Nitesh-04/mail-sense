@@ -14,19 +14,19 @@ datasource db {
 }
 
 model User {
-  id           String              @id @default(uuid())
-  clerkId      String              @unique
-  name         String
-  mailId       String              @unique
-  accessToken  String?
-  refreshToken String?
-  tokenExpiry  DateTime?
-  lastEmailId  String?
-  firstFetch   Boolean             @default(false)
-  emails       Email[]
-  embeddings   PineconeEmbedding[]
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
+  id            String              @id @default(uuid())
+  clerkId       String              @unique
+  name          String
+  mailId        String              @unique
+  accessToken   String?
+  refreshToken  String?
+  tokenExpiry   DateTime?
+  lastEmailDate DateTime?
+  firstFetch    Boolean             @default(false)
+  emails        Email[]
+  embeddings    PineconeEmbedding[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 }
 
 model Email {

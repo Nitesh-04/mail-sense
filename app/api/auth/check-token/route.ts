@@ -67,7 +67,7 @@ export async function GET() {
           tokenRefreshed: true 
         });
       } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
+        console.error("Token refresh failed:");
         return NextResponse.json({ 
           hasToken: false, 
           error: "Failed to refresh Gmail authentication" 
