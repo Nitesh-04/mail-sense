@@ -1,92 +1,104 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
-import { getCdcMails, getMiscMails} from "./_actions/actions";
+import { useState, useEffect, useCallback } from "react";
+import { getAcademicMails, getCdcMails, getEventsMails, getHostelMails, getMiscMails } from "./_actions/actions";
 import { redirect } from "next/navigation";
+import { Email } from "@/lib/types";
+import RenderMails from "./_components/RenderMails";
 
-type Email = {
-  id: string;
-  sender: string;
-  subject: string;
-  body: string | null;
-  summary: string;
-  receivedAt: Date;
-  category: string;
+type EmailCategories = {
+  academic: Email[];
+  cdc: Email[];
+  events: Email[];
+  hostel: Email[];
+  misc: Email[];
 };
 
 export default function MailPage() {
   const { user } = useUser();
-  const [emails, setEmails] = useState<Email[]>([]);
+  const [emails, setEmails] = useState<EmailCategories>({
+    academic: [],
+    cdc: [],
+    events: [],
+    hostel: [],
+    misc: [],
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const fetchAllEmails = useCallback(async (userId: string) => {
+    try {
+      const [academic, cdc, events, hostel, misc] = await Promise.all([
+        getAcademicMails(userId),
+        getCdcMails(userId),
+        getEventsMails(userId),
+        getHostelMails(userId),
+        getMiscMails(userId),
+      ]);
+
+      setEmails({
+        academic,
+        cdc,
+        events,
+        hostel,
+        misc,
+      });
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : "Failed to fetch emails");
+    }
+  }, []);
 
   useEffect(() => {
     if (!user) {
       redirect("/sign-in");
+      return;
     }
-    async function fetchEmails() {
 
-    const userId = user?.id;
+    const userId = user.id;
+    if (!userId) return;
 
-      if (!userId) {
-        throw new Error("User ID is undefined");
-      }
+    fetchAllEmails(userId).catch((err) => {
+      setError(err.message);
+      console.error("Error fetching emails:", err);
+    });
+  }, [user, fetchAllEmails]);
 
-      const fetchedEmails = await getMiscMails(userId);
-      
-      setEmails(fetchedEmails);
-    }
-    fetchEmails();
-  }, [user]);
-
-
-  const syncAndFetchEmails = async () => {
+  async function syncAndFetchEmails() {
+    if (!user?.id) return;
+    
     setLoading(true);
+    setError("");
+
     try {
       const syncResponse = await fetch("/api/fetch-mails");
-
       if (!syncResponse.ok) {
         throw new Error("Failed to sync emails with Gmail");
       }
 
-      const userId = user?.id;
-
-      if (!userId) {
-        throw new Error("User ID is undefined");
-      }
-
-      const fetchedEmails = await getMiscMails(userId);
-
-      setEmails(fetchedEmails);
-
+      await fetchAllEmails(user.id);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
           : "An error occurred while processing emails."
       );
-      console.error(err);
+      console.error("Error syncing emails:", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Your Emails</h1>
-        <button onClick={syncAndFetchEmails}>Fetch Mails</button>
+        <button 
+          onClick={syncAndFetchEmails} 
+          disabled={loading}
+        >
+          Fetch Mails
+        </button>
 
         {loading && (
           <div className="flex justify-center items-center py-8">
@@ -99,39 +111,14 @@ export default function MailPage() {
             <p className="text-red-700">{error}</p>
           </div>
         )}
+         <RenderMails emailCategories={emails} />
 
-        {!loading && emails.length === 0 && (
-          <div className="text-center py-8 bg-gray-50 rounded-lg">
-            <p className="text-gray-600">No emails found</p>
-          </div>
-        )}
-
-        <div className="space-y-4">
-          {emails.map((email) => (
-            <div
-              key={email.id}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200"
-            >
-              <div className="flex justify-between items-start mb-3">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  {email.subject}
-                </h2>
-                <span className="text-sm text-gray-500">
-                  {formatDate(email.receivedAt)}
-                </span>
-              </div>
-
-              <p className="text-gray-600 mb-2">
-                <span className="font-medium">From:</span> {email.sender}
-              </p>
-
-              <div className="mt-4 text-gray-700">
-                <p className="line-clamp-3">{email.summary}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <button onClick={syncAndFetchEmails}>Fetch Mails</button>
+        <button 
+          onClick={syncAndFetchEmails}
+          disabled={loading}
+        >
+          Fetch Mails
+        </button>
       </div>
     </div>
   );
