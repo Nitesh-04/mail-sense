@@ -105,7 +105,7 @@ export async function GET() {
     }
 
     if (!user.firstFetch) {
-      const mostRecentEmailDate = await fetchAndCreateEmails(user.accessToken, userId, null, 200);
+      const mostRecentEmailDate = await fetchAndCreateEmails(user.accessToken, userId, null, 10);
       
       await prisma.user.update({
         where: { clerkId: userId },
@@ -123,8 +123,8 @@ export async function GET() {
       const mostRecentEmailDate = await fetchAndCreateEmails(
         user.accessToken,
         userId,
-        user.lastEmailDate || null,
-        50
+        user.lastEmailDate,
+        10
       );
       
       if (mostRecentEmailDate) {

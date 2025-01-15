@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { checkUser } from "./_actions/actions";
 import Link from "next/link";
+import { Mail, MessageSquare, Loader2 } from "lucide-react";
+import { Funnel_Display } from "next/font/google";
+import { Button } from "@/components/ui/button";
+import DarkModeToggle from "../_components/DarkModeToggle";
+
+const funnel = Funnel_Display({ subsets: ["latin"], weight: ["600"] });
 
 export default function AccessPage() {
   const { user } = useUser();
@@ -21,7 +27,6 @@ export default function AccessPage() {
     const checkAuth = async () => {
       try {
         const response = await fetch("/api/auth/check-token");
-        
         const data = await response.json();
         
         if (data.error) {
@@ -30,7 +35,6 @@ export default function AccessPage() {
         }
 
         if (data.hasToken) {
-          
           router.push('/mail');
         } else {
           await checkUser(
@@ -71,34 +75,64 @@ export default function AccessPage() {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold mb-4">Connect Your Gmail Account</h1>
-      
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-          {error}
+    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
+      <div className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <Link href="/" className={`${funnel.className} text-4xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-600`}>
+            MailSense
+          </Link>
+          <DarkModeToggle />
         </div>
-      )}
-      
-      <p className="text-center mb-8 text-gray-700">
-        You need to authenticate with your Gmail account to fetch and categorize
-        your emails.
-      </p>
-      
-      <button
-        onClick={handleGmailAuth}
-        disabled={loading}
-        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition disabled:bg-gray-400"
-      >
-        {loading ? "Authenticating..." : "Authenticate with Gmail"}
-      </button>
-      
-      <br/>
-      <span className="font-bold">KINDLY USE THE SAME EMAIL ID AS REGISTERED WITH MAILSENSE</span>
-      
-      <p className="text-black font-bold text-lg mt-10 border-2 border-blue-600 rounded-md p-2">
-        <Link href={"/chat"}>Chat</Link>
-      </p>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 py-16">
+        <div className="space-y-8 text-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <Mail className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          </div>
+
+          <div className="space-y-4">
+            <h1 className={`${funnel.className} text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-600`}>
+              Connect Your Gmail Account
+            </h1>
+            
+            <p className="text-zinc-600 dark:text-zinc-400 mx-auto">
+              You need to authenticate with your Gmail account to fetch your emails.
+            </p>
+          </div>
+
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <p className="text-blue-800 dark:text-blue-200 font-medium">
+              Please use the same email address that you registered with MailSense
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <Button
+              onClick={handleGmailAuth}
+              disabled={loading}
+              className="w-full max-w-md bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-6 text-lg"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                "Authenticate with Gmail"
+              )}
+            </Button>
+            <br/>
+            <Link 
+              href="/chat"
+              className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+            >
+              <MessageSquare className="w-5 h-5" />
+              Go to Chat
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
