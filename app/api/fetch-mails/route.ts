@@ -4,6 +4,7 @@ import prisma from "@/utils/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { categoriseMail } from "@/utils/categoriseMail";
+import { summariser } from "@/utils/summariseMail";
 
 async function fetchAndCreateEmails(
   accessToken: string,
@@ -49,6 +50,8 @@ async function fetchAndCreateEmails(
         ? Buffer.from(bodyData, "base64").toString("utf-8")
         : "No content";
 
+      const summary = await summariser(body);
+
       const internalDate =
         msgDetails.data.internalDate || Date.now().toString();
       const receivedAt = new Date(parseInt(internalDate, 10));
@@ -65,7 +68,7 @@ async function fetchAndCreateEmails(
           sender: from,
           subject,
           body,
-          summary: body.slice(0, 200),
+          summary,
           receivedAt,
           category: mailCategory,
         },
@@ -105,7 +108,7 @@ export async function GET() {
     }
 
     if (!user.firstFetch) {
-      const mostRecentEmailDate = await fetchAndCreateEmails(user.accessToken, userId, null, 10);
+      const mostRecentEmailDate = await fetchAndCreateEmails(user.accessToken, userId, null, 2);
       
       await prisma.user.update({
         where: { clerkId: userId },
@@ -124,7 +127,7 @@ export async function GET() {
         user.accessToken,
         userId,
         user.lastEmailDate,
-        10
+        2
       );
       
       if (mostRecentEmailDate) {
