@@ -107,43 +107,22 @@ export async function GET() {
       );
     }
 
-    if (!user.firstFetch) {
-      const mostRecentEmailDate = await fetchAndCreateEmails(user.accessToken, userId, null, 2);
-      
-      await prisma.user.update({
-        where: { clerkId: userId },
-        data: { 
-          firstFetch: true,
-          lastEmailDate: mostRecentEmailDate
-        },
-      });
+    const mostRecentEmailDate = !user.firstFetch
+      ? await fetchAndCreateEmails(user.accessToken, userId, null, 5)
+      : await fetchAndCreateEmails(user.accessToken, userId, user.lastEmailDate, 5);
 
-      return NextResponse.json({
-        success: true,
-        message: "Emails successfully synced to database",
-      });
-    } else {
-      const mostRecentEmailDate = await fetchAndCreateEmails(
-        user.accessToken,
-        userId,
-        user.lastEmailDate,
-        2
-      );
-      
-      if (mostRecentEmailDate) {
-        await prisma.user.update({
-          where: { clerkId: userId },
-          data: { 
-            lastEmailDate: mostRecentEmailDate
-          },
-        });
-      }
+    await prisma.user.update({
+      where: { clerkId: userId },
+      data: {
+        firstFetch: true,
+        lastEmailDate: mostRecentEmailDate,
+      },
+    });
 
       return NextResponse.json({
         success: true,
         message: "New emails synced to database",
       });
-    }
 
   } catch (error) {
     console.error("Failed to fetch/create emails:", error);

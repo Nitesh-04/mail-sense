@@ -55,7 +55,7 @@ export default function Home() {
         </div>
 
         <Button className={`${funnel.className} mt-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-400 dark:hover:to-purple-400 animate-fade-in dark:text-white px-8 py-6 text-lg rounded-lg transition-all duration-300 hover:scale-105 mb-10 md:mb-0`}>
-          <Link href={"/chat"}>Get Started</Link>
+          <Link href={"/authorise"}>Get Started</Link>
         </Button>
       </div>
     </div>

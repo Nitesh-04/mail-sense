@@ -1,13 +1,17 @@
 export async function summariser(data: string): Promise<string> {
     try {
         const cleanedInput = data
-            .replace(/<[^>]*>/g, '')
-            .replace(/\s+/g, ' ')
+            .replace(/<[^>]*>/g, '') 
+            .replace(/```[\s\S]*?```/g, '') 
+            .replace(/`[^`]*`/g, '') 
+            .replace(/https?:\/\/\S+/g, '') 
+            .replace(/[^\x00-\x7F]+/g, '') 
+            .replace(/\s+/g, ' ') 
             .trim()
-            .slice(0, 2000);
+            .slice(0, 1500); 
 
         const response = await fetch(
-            "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
+            `${process.env.SUMMARISATION_URL}`,
             {
                 headers: {
                     Authorization: `Bearer ${process.env.SUMMARISATION_HF_API_KEY}`,

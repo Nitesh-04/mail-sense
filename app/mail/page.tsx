@@ -1,11 +1,17 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useUser, UserButton } from "@clerk/nextjs";
 import { useState, useEffect, useCallback } from "react";
 import { getAcademicMails, getCdcMails, getEventsMails, getHostelMails, getMiscMails } from "./_actions/actions";
 import { redirect } from "next/navigation";
 import { Email } from "@/lib/types";
 import RenderMails from "./_components/RenderMails";
+import Link from "next/link";
+import { MessageSquare } from "lucide-react";
+import DarkModeToggle from "../_components/DarkModeToggle";
+import { Funnel_Display } from "next/font/google";
+
+const funnel = Funnel_Display({ subsets: ["latin"], weight: ["600"] });
 
 type EmailCategories = {
   academic: Email[];
@@ -90,36 +96,55 @@ export default function MailPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Your Emails</h1>
-        <button 
-          onClick={syncAndFetchEmails} 
-          disabled={loading}
-        >
-          Fetch Mails
-        </button>
-
-        {loading && (
-          <div className="flex justify-center items-center py-8">
-            <p className="text-gray-600">Loading emails...</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
-            <p className="text-red-700">{error}</p>
-          </div>
-        )}
-         <RenderMails emailCategories={emails} />
-
-        <button 
-          onClick={syncAndFetchEmails}
-          disabled={loading}
-        >
-          Fetch Mails
-        </button>
-      </div>
+    <>
+      <div className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-500 p-4 shadow-sm">
+  <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <div className="flex items-center gap-20">
+      <Link href="/" className={`${funnel.className} text-4xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-600`}>
+        MailSense
+      </Link>
+      <Link 
+        href="/chat" 
+        className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 text-white font-medium shadow-md hover:shadow-lg transition-all"
+      >
+        <MessageSquare className="w-5 h-5" />
+        <span>Chat</span>
+      </Link>
     </div>
+    <div className="flex items-center gap-10">
+      <UserButton
+        appearance={{ elements: { userButtonAvatarBox: "w-10 h-10" } }}
+      />
+      <DarkModeToggle />
+    </div>
+  </div>
+</div>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6">Your Emails</h1>
+          <button 
+            onClick={syncAndFetchEmails} 
+            disabled={loading}
+          >
+            Fetch Mails
+          </button>
+
+          {loading && (
+            <div className="flex justify-center items-center py-8">
+              <p className="text-gray-600">Loading emails...</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+              <p className="text-red-700">{error}</p>
+            </div>
+          )}
+          
+          <RenderMails emailCategories={emails} />
+        </div>
+      </div>
+    </>
   );
 }

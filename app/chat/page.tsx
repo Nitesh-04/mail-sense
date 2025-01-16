@@ -67,16 +67,16 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-zinc-800 transition-colors duration-300">
-      <div className="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-500 p-4 shadow-sm">
+    <div className="flex flex-col h-screen bg-white dark:bg-zinc-900 transition-colors duration-300">
+      <div className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-500 p-4 shadow-sm">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-20">
             <Link href="/" className={`${funnel.className} text-4xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-600`}>
               MailSense
             </Link>
             <Link 
               href="/mail" 
-              className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 text-white font-medium shadow-md hover:shadow-lg transition-all"
             >
               <Mail className="w-5 h-5" />
               <span>Mail</span>
@@ -84,14 +84,14 @@ export default function ChatPage() {
           </div>
           <div className="flex items-center gap-10">
             <UserButton
-                appearance={{ elements: { userButtonAvatarBox: "w-10 h-10" } }}
+              appearance={{ elements: { userButtonAvatarBox: "w-10 h-10" } }}
             />
             <DarkModeToggle />
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-zinc-800 transition-colors duration-300">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-zinc-900 transition-colors duration-300">
         {messages.map((message) => (
           <div
             key={message.id}
