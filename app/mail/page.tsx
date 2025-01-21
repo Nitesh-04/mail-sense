@@ -7,9 +7,9 @@ import { redirect } from "next/navigation";
 import { Email } from "@/lib/types";
 import RenderMails from "./_components/RenderMails";
 import Link from "next/link";
-import { MessageSquare } from "lucide-react";
 import DarkModeToggle from "../_components/DarkModeToggle";
 import { Funnel_Display } from "next/font/google";
+import { Button } from "@/components/ui/button";
 
 const funnel = Funnel_Display({ subsets: ["latin"], weight: ["600"] });
 
@@ -103,13 +103,6 @@ export default function MailPage() {
       <Link href="/" className={`${funnel.className} text-4xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-600`}>
         MailSense
       </Link>
-      <Link 
-        href="/chat" 
-        className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 text-white font-medium shadow-md hover:shadow-lg transition-all"
-      >
-        <MessageSquare className="w-5 h-5" />
-        <span>Chat</span>
-      </Link>
     </div>
     <div className="flex items-center gap-10">
       <UserButton
@@ -122,13 +115,15 @@ export default function MailPage() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">Your Emails</h1>
-          <button 
+          <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold">Your Emails</h1>
+          <Button 
             onClick={syncAndFetchEmails} 
             disabled={loading}
           >
             Fetch Mails
-          </button>
+          </Button>
+          </div>
 
           {loading && (
             <div className="flex justify-center items-center py-8">

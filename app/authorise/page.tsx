@@ -24,26 +24,16 @@ export default function AccessPage() {
       return;
     }
 
-    const checkAuth = async () => {
+    async function checkAuth() {
       try {
-        const response = await fetch("/api/auth/check-token");
-        const data = await response.json();
-        
-        if (data.error) {
-          setError(data.error);
-          return;
-        }
-
-        if (data.hasToken) {
-          router.push('/mail');
-        } else {
+        if(user) {
           await checkUser(
             user.id,
             user.primaryEmailAddress?.emailAddress || "",
             user.fullName || ""
           );
         }
-      } catch (error) {
+        }  catch (error) {
         console.error("Error checking token:", error);
         setError("Failed to validate authentication status");
       }
@@ -124,11 +114,11 @@ export default function AccessPage() {
             </Button>
             <br/>
             <Link 
-              href="/chat"
+              href="/mail"
               className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
             >
               <MessageSquare className="w-5 h-5" />
-              Go to Chat
+              Go to Mail
             </Link>
           </div>
         </div>

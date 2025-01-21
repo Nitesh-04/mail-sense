@@ -67,7 +67,6 @@ async function fetchAndCreateEmails(
           clerkId: userId,
           sender: from,
           subject,
-          body,
           summary,
           receivedAt,
           category: mailCategory,
@@ -108,7 +107,7 @@ export async function GET() {
     }
 
     const mostRecentEmailDate = !user.firstFetch
-      ? await fetchAndCreateEmails(user.accessToken, userId, null, 5)
+      ? await fetchAndCreateEmails(user.accessToken, userId, null, 10)
       : await fetchAndCreateEmails(user.accessToken, userId, user.lastEmailDate, 5);
 
     await prisma.user.update({
