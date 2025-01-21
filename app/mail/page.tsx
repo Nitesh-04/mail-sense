@@ -127,7 +127,7 @@ export default function MailPage() {
 
           {loading && (
             <div className="flex justify-center items-center py-8">
-              <p className="text-gray-600">Loading emails...</p>
+              <p className="text-gray-600">Loading emails.. It might take some time.</p>
             </div>
           )}
 
